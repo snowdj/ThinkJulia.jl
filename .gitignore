@@ -3,3 +3,15 @@
 *.jl.mem
 deps/deps.jl
 docs/build
+docs/captions
+docs/output.txt
+docs/fake_travis.jl
+book/build
+book/captions
+book/output.txt
+book/fonts
+book/lib
+book/my-theme.yml
+book/fake_travis.jl
+book/delim_file.txt
+site

@@ -1,104 +1,90 @@
-# Case study: interface design
+# Case Study: Interface Design
 
 This chapter presents a case study that demonstrates a process for designing functions that work together.
 
-It introduces the `Luxor` module, which allows you to create images using turtle graphics. 
+It introduces the `ThinkJulia` module, which allows you to create images using turtle graphics based on the `Luxor` package.
 
 The examples in this chapter can be executed in a graphical notebook on JuliaBox, which combines code, formatted text, math, and multimedia in a single document.
 
-## The Luxor module
+## Turtles
 
-A **module** is a file that contains a collection of related functions. Modules can be installed in the REPL:
-```julia
-julia> Pkg.add("Luxor")
-INFO: Cloning cache of Luxor from https://github.com/JuliaGraphics/Luxor.jl.git
-INFO: Installing Luxor v0.10.4
-...
+A **module** is a file that contains a collection of related functions. Modules can be installed in the REPL by entering the Pkg REPL-mode using the key `]`.
+
+```julia-repl
+(v0.7) pkg> add ThinkJulia
 ```
 
 This can take some time.
 
 Before we can use the functions in a module, we have to import it with an `using` statement:
-```@example chap04
-using Luxor
-bob = Turtle()
+
+```jldoctest
+julia> using ThinkJulia
+
+julia> 🐢 = Turtle()
+Luxor.Turtle(0.0, 0.0, true, 0.0, (0.0, 0.0, 0.0))
 ```
 
-The `Luxor` module provides a function called `Turtle` that creates a `Luxor.Turtle` object, which we assign to a variable named `bob`.
+The `ThinkJulia` module provides a function called `Turtle` that creates a `Luxor.Turtle` object, which we assign to a variable named `🐢` (`\:turtle: TAB`).
 
-Once you create a Turtle, you can call a function to move it around a drawing. For example, to move the Turtle forward:
+Once you create a turtle, you can call a function to move it around a drawing. For example, to move the turtle forward:
 
 ```julia
 @svg begin
-    Forward(bob, 100)
+    forward(🐢, 100)
 end
 ```
 
-```@eval
-using ThinkJulia
-fig04_1()
-```
-
-```@raw html
-<figure>
-  <img src="fig41.svg" alt="Moving the turtle forward.">
-  <figcaption>Figure 4.1. Moving the turtle forward.</figcaption>
-</figure>
-```
-
-```@raw latex
-\begin{figure}
-\centering
-\includegraphics{fig41}
-\caption{Moving the turtle forward.}
-\label{fig41}
-\end{figure}
-```
+![Moving the turtle forward.](images/fig41.svg)
 
 The `@svg` keyword starts a macro that draws a svg picture. Macros are an important but advanced feature of Julia.
 
-The arguments of `Forward` are the Turtle and a distance in pixels, so the actual size depends on your display.
+The arguments of `forward` are the turtle and a distance in pixels, so the actual size depends on your display.
 
-Another function you can call with a Turtle as argument is `Turn` for turning. The second argument for `Turn` is an angle in degrees.
+Another function you can call with a turtle as argument is `turn` for turning. The second argument for `turn` is an angle in degrees.
 
-Also, each Turtle is holding a pen, which is either down or up; if the pen is down, the Turtle leaves a trail when it moves. Figure 1 shows the trail left behind by the Turtle. The functions `Penup` and `Pendown` stand for “pen up” and “pen down”.
+Also, each turtle is holding a pen, which is either down or up; if the pen is down, the turtle leaves a trail when it moves. Figure 4-1 shows the trail left behind by the turtle. The functions `penup` and `pendown` stand for “pen up” and “pen down”.
 
 To draw a right angle, modify the macro:
 
 ```julia
-bob = Turtle()
+🐢 = Turtle()
 @svg begin
-    Forward(bob, 100)
-    Turn(bob, -90)
-    Forward(bob, 100)
+    forward(🐢, 100)
+    turn(🐢, -90)
+    forward(🐢, 100)
 end
 ```
 
 Now modify the macro to draw a square. Don’t go on until you’ve got it working!
 
-## Simple repetition
+## Simple Repetition
 
 Chances are you wrote something like this:
 
 ```julia
-bob = Turtle()
+🐢 = Turtle()
 @svg begin
-    Forward(bob, 100)
-    Turn(bob, -90)
-    Forward(bob, 100)
-    Turn(bob, -90)
-    Forward(bob, 100)
-    Turn(bob, -90)
-    Forward(bob, 100)
+    forward(🐢, 100)
+    turn(🐢, -90)
+    forward(🐢, 100)
+    turn(🐢, -90)
+    forward(🐢, 100)
+    turn(🐢, -90)
+    forward(🐢, 100)
 end
 ```
 
 We can do the same thing more concisely with a `for` statement:
 
-```@repl
-for i in 1:4
-    println("Hello!")
-end
+```jldoctest
+julia> for i in 1:4
+          println("Hello!")
+       end
+Hello!
+Hello!
+Hello!
+Hello!
 ```
 
 This is the simplest use of the `for` statement; we will see more later. But that should be enough to let you rewrite your square-drawing program. Don’t go on until you do.
@@ -106,11 +92,11 @@ This is the simplest use of the `for` statement; we will see more later. But tha
 Here is a `for` statement that draws a square:
 
 ```julia
-bob = Turtle()
+🐢 = Turtle()
 @svg begin
     for i in 1:4
-        Forward(bob, 100)
-        Turn(bob, -90)
+        forward(🐢, 100)
+        turn(🐢, -90)
     end
 end
 ```
@@ -123,19 +109,19 @@ This version is actually a little different from the previous square-drawing cod
 
 ## Exercises
 
-The following is a series of exercises using Turtles. They are meant to be fun, but they have a point, too. While you are working on them, think about what the point is.
+The following is a series of exercises using turtles. They are meant to be fun, but they have a point, too. While you are working on them, think about what the point is.
 
 The following sections have solutions to the exercises, so don’t look until you have finished (or at least tried).
 
 1. Write a function called `square` that takes a parameter named `t`, which is a turtle. It should use the turtle to draw a square.
 
-2. Write a function call that passes `bob` as an argument to `square`, and then run the macro again.
+2. Write a function call that passes `t` as an argument to `square`, and then run the macro again.
 
-3. Add another parameter, named `length`, to square. Modify the body so length of the sides is length, and then modify the function call to provide a second argument. Run the macro again. Test with a range of values for `length`.
+3. Add another parameter, named `len`, to square. Modify the body so length of the sides is `len`, and then modify the function call to provide a second argument. Run the macro again. Test with a range of values for `len`.
 
-4. Make a copy of `square` and change the name to `polygon`. Add another parameter named `n` and modify the body so it draws an n-sided regular polygon. Hint: The exterior angles of an n-sided regular polygon are 360/n degrees.
+4. Make a copy of `square` and change the name to `polygon`. Add another parameter named `n` and modify the body so it draws an ``n``-sided regular polygon. Hint: The exterior angles of an ``n``-sided regular polygon are ``\frac{360}{n}`` degrees.
 
-5. Write a function called `circle` that takes a turtle, `t`, and radius, `r`, as parameters and that draws an approximate circle by calling `polygon` with an appropriate length and number of sides. Test your function with a range of values of `r`. Hint: figure out the circumference of the circle and make sure that `length * n == circumference`.
+5. Write a function called `circle` that takes a turtle, `t`, and radius, `r`, as parameters and that draws an approximate circle by calling `polygon` with an appropriate length and number of sides. Test your function with a range of values of `r`. Hint: figure out the circumference of the circle and make sure that `len * n == circumference`.
 
 6. Make a more general version of `circle` called `arc` that takes an additional parameter `angle`, which determines what fraction of a circle to draw. `angle` is in units of degrees, so when `angle=360`, `arc` should draw a complete circle.
 
@@ -146,24 +132,24 @@ The first exercise asks you to put your square-drawing code into a function defi
 ```julia
 function square(t)
     for i in 1:4
-        Forward(t, 100)
-        Turn(t, -90)
+        forward(t, 100)
+        turn(t, -90)
     end
 end
-bob = Turtle()
+🐢 = Turtle()
 @svg begin
-    square(bob)
+    square(🐢)
 end
 ```
 
-The innermost statements, `Forward` and `Turn` are indented twice to show that they are inside the `for` loop, which is inside the function definition.
+The innermost statements, `forward` and `turn` are indented twice to show that they are inside the `for` loop, which is inside the function definition.
 
-Inside the function, `t` refers to the same turtle `bob`, so `Turn(t, -90)` has the same effect as `Turn(bob, -90)`. In that case, why not call the parameter `bob`? The idea is that `t` can be any turtle, not just bob, so you could create a second turtle and pass it as an argument to `square`:
+Inside the function, `t` refers to the same turtle `🐢`, so `turn(t, -90)` has the same effect as `turn(🐢, -90)`. In that case, why not call the parameter `🐢`? The idea is that `t` can be any turtle, not just `🐢`, so you could create a second turtle and pass it as an argument to `square`:
 
 ```julia
-alice = Turtle()
+🐫 = Turtle()
 @svg begin
-    square(alice)
+    square(🐫)
 end
 ```
 
@@ -171,18 +157,18 @@ Wrapping a piece of code up in a function is called **encapsulation**. One of th
 
 ## Generalization
 
-The next step is to add a `length` parameter to `square`. Here is a solution:
+The next step is to add a `len` parameter to `square`. Here is a solution:
 
 ```julia
-function square(t, length)
+function square(t, len)
     for i in 1:4
-        Forward(t, length)
-        Turn(t, -90)
+        forward(t, len)
+        turn(t, -90)
     end
 end
-bob = Turtle()
+🐢 = Turtle()
 @svg begin
-    square(bob, 100)
+    square(🐢, 100)
 end
 ```
 
@@ -191,22 +177,22 @@ Adding a parameter to a function is called **generalization** because it makes t
 The next step is also a generalization. Instead of drawing squares, `polygon` draws regular polygons with any number of sides. Here is a solution:
 
 ```julia
-function polygon(t, n, length)
+function polygon(t, n, len)
     angle = 360 / n
     for i in 1:n
-        Forward(t, length)
-        Turn(t, -angle)
+        forward(t, len)
+        turn(t, -angle)
     end
 end
-bob = Turtle()
+🐢 = Turtle()
 @svg begin
-    polygon(bob, 7, 70)
+    polygon(🐢, 7, 70)
 end
 ```
 
 This example draws a 7-sided polygon with side length 70.
 
-## Interface design
+## Interface Design
 
 The next step is to write `circle`, which takes a radius, `r`, as a parameter. Here is a simple solution that uses `polygon` to draw a 50-sided polygon:
 
@@ -214,12 +200,12 @@ The next step is to write `circle`, which takes a radius, `r`, as a parameter. H
 function circle(t, r)
     circumference = 2 * π * r
     n = 50
-    length = circumference / n
-    polygon(t, n, length)
+    len = circumference / n
+    polygon(t, n, len)
 end
 ```
 
-The first line computes the circumference of a circle with radius $r$ using the formula $2 π r$. `n` is the number of line segments in our approximation of a circle, so length is the length of each segment. Thus, `polygon` draws a 50-sided polygon that approximates a circle with radius `r`.
+The first line computes the circumference of a circle with radius ``r`` using the formula ``2 π r``. `n` is the number of line segments in our approximation of a circle, so `len` is the length of each segment. Thus, `polygon` draws a 50-sided polygon that approximates a circle with radius `r`.
 
 One limitation of this solution is that `n` is a constant, which means that for very big circles, the line segments are too long, and for small circles, we waste time drawing very small segments. One solution would be to generalize the function by taking `n` as a parameter. This would give the user (whoever calls circle) more control, but the interface would be less clean.
 
@@ -233,8 +219,8 @@ Rather than clutter up the interface, it is better to choose an appropriate valu
 function circle(t, r)
     circumference = 2 * π * r
     n = trunc(circumference / 3) + 3
-    length = circumference / n
-    polygon(t, n, length)
+    len = circumference / n
+    polygon(t, n, len)
 end
 ```
 
@@ -250,13 +236,13 @@ One alternative is to start with a copy of `polygon` and transform it into `arc`
 
 ```julia
 function arc(t, r, angle)
-    arc_length = 2 * π * r * angle / 360
-    n = trunc(arc_length / 3) + 1
-    step_length = arc_length / n
+    arc_len = 2 * π * r * angle / 360
+    n = trunc(arc_len / 3) + 1
+    step_len = arc_len / n
     step_angle = angle / n
     for i in 1:n
-        Forward(t, step_length)
-        Turn(t, -step_angle)
+        forward(t, step_len)
+        turn(t, -step_angle)
     end
 end
 ```
@@ -264,10 +250,10 @@ end
 The second half of this function looks like `polygon`, but we can’t re-use `polygon` without changing the interface. We could generalize `polygon` to take an `angle` as a third argument, but then `polygon` would no longer be an appropriate name! Instead, let’s call the more general function `polyline`:
 
 ```julia
-function polyline(t, n, length, angle)
-    for i 1:n
-        Forward(t, length)
-        Turn(t, -angle)
+function polyline(t, n, len, angle)
+    for i in 1:n
+        forward(t, len)
+        turn(t, -angle)
     end
 end
 ```
@@ -275,17 +261,17 @@ end
 Now we can rewrite `polygon` and `arc` to use `polyline`:
 
 ```julia
-function polygon(t, n, length)
+function polygon(t, n, len)
     angle = 360 / n
-    polyline(t, n, length, angle)
+    polyline(t, n, len, angle)
 end
 
 function arc(t, r, angle)
-    arc_length = 2 * π * r * angle / 360
-    n = trunc(arc_length / 3) + 1
-    step_length = arc_length / n
+    arc_len = 2 * π * r * angle / 360
+    n = trunc(arc_len / 3) + 1
+    step_len = arc_len / n
     step_angle = angle / n
-    polyline(t, n, step_length, step_angle)
+    polyline(t, n, step_len, step_angle)
 end
 ```
 
@@ -301,7 +287,7 @@ This process—rearranging a program to improve interfaces and facilitate code r
 
 If we had planned ahead, we might have written `polyline` first and avoided refactoring, but often you don’t know enough at the beginning of a project to design all the interfaces. Once you start coding, you understand the problem better. Sometimes refactoring is a sign that you have learned something.
 
-## A development plan
+## A Development Plan
 
 A **development plan** is a process for writing programs. The process we used in this case study is “encapsulation and generalization”. The steps of this process are:
 
@@ -317,32 +303,32 @@ A **development plan** is a process for writing programs. The process we used in
 
 This process has some drawbacks—we will see alternatives later—but it can be useful if you don’t know ahead of time how to divide the program into functions. This approach lets you design as you go along.
 
-## docstring
+## Docstring
 
 A **docstring** is a string before a function that explains the interface (“doc” is short for “documentation”). Here is an example:
 
 ```julia
 """
-polyline(t, n, length, angle)
+polyline(t, n, len, angle)
 
 Draws n line segments with the given length and
 angle (in degrees) between them.  t is a turtle.
-""" 
-function polyline(t, n, length, angle)
+"""
+function polyline(t, n, len, angle)
     for i in 1:n
-        Forward(t, length)
-        Turn(t, -angle)
+        forward(t, len)
+        turn(t, -angle)
     end
 end
 ```
 
-Documentation can be accessed at the REPL or in a notebook by typing ? followed by the name of a function or macro, and pressing `Enter`:
+Documentation can be accessed in the REPL or in a notebook by typing ? followed by the name of a function or macro, and pressing `ENTER`:
 
 ```julia
 help?> polyline
 search:
 
-  polyline(t, n, length, angle)
+  polyline(t, n, len, angle)
 
   Draws n line segments with the given length and angle (in degrees) between them. t is a turtle.
 ```
@@ -357,9 +343,9 @@ Writing this kind of documentation is an important part of interface design. A w
 
 An interface is like a contract between a function and a caller. The caller agrees to provide certain parameters and the function agrees to do certain work.
 
-For example, `polyline` requires four arguments: `t` has to be a Turtle; `n` has to be an integer; `length` should be a positive number; and `angle` has to be a number, which is understood to be in degrees.
+For example, `polyline` requires four arguments: `t` has to be a turtle; `n` has to be an integer; `len` should be a positive number; and `angle` has to be a number, which is understood to be in degrees.
 
-These requirements are called **preconditions** because they are supposed to be true before the function starts executing. Conversely, conditions at the end of the function are **postconditions**. Postconditions include the intended effect of the function (like drawing line segments) and any side effects (like moving the Turtle or making other changes).
+These requirements are called **preconditions** because they are supposed to be true before the function starts executing. Conversely, conditions at the end of the function are **postconditions**. Postconditions include the intended effect of the function (like drawing line segments) and any side effects (like moving the turtle or making other changes).
 
 Preconditions are the responsibility of the caller. If the caller violates a (properly documented!) precondition and the function doesn’t work correctly, the bug is in the caller, not the function.
 
@@ -402,115 +388,58 @@ A requirement that should be satisfied by the function before it ends.
 
 ## Exercises
 
-### Exercise 1  
+### Exercise 4-1
 
 Enter the code in this chapter in a notebook.
 
-1. Draw a stack diagram that shows the state of the program while executing `circle(bob, radius)`. You can do the arithmetic by hand or add print statements to the code.
+1. Draw a stack diagram that shows the state of the program while executing `circle(🐢, radius)`. You can do the arithmetic by hand or add print statements to the code.
 
-2. The version of arc in Section 4.7 is not very accurate because the linear approximation of the circle is always outside the true circle. As a result, the Turtle ends up a few pixels away from the correct destination. My solution shows a way to reduce the effect of this error. Read the code and see if it makes sense to you. If you draw a diagram, you might see how it works.
+2. The version of `arc` in Section 4.7 is not very accurate because the linear approximation of the circle is always outside the true circle. As a result, the turtle ends up a few pixels away from the correct destination. My solution shows a way to reduce the effect of this error. Read the code and see if it makes sense to you. If you draw a diagram, you might see how it works.
 
 ```julia
-""" 
+"""
 arc(t, r, angle)
 
 Draws an arc with the given radius and angle:
 
-    t: Turtle
+    t: turtle
     r: radius
     angle: angle subtended by the arc, in degrees
 """
 function arc(t, r, angle)
-    arc_length = 2 * π * r * abs(angle) / 360
-    n = trunc(arc_length / 4) + 3
-    step_length = arc_length / n
+    arc_len = 2 * π * r * abs(angle) / 360
+    n = trunc(arc_len / 4) + 3
+    step_len = arc_len / n
     step_angle = angle / n
 
     # making a slight left turn before starting reduces
     # the error caused by the linear approximation of the arc
-    Turn(t, step_angle/2)
-    polyline(t, n, step_length, step_angle)
-    Turn(t, -step_angle/2)
+    turn(t, step_angle/2)
+    polyline(t, n, step_len, step_angle)
+    turn(t, -step_angle/2)
 end
 ```
 
-### Exercise 2  
+### Exercise 4-2
 
-Write an appropriately general set of functions that can draw flowers as in Figure 4.2.
+Write an appropriately general set of functions that can draw flowers as in Figure 4-2.
 
-```@eval
-using ThinkJulia
-fig04_2()
-```
+![Turtle flowers.](images/fig42.svg)
 
-```@raw html
-<figure>
-  <img src="fig42.svg" alt="Turtle flowers.">
-  <figcaption>Figure 4.2. Turtle flowers.</figcaption>
-</figure>
-```
+### Exercise 4-3
 
-```@raw latex
-\begin{figure}
-\centering
-\includegraphics{fig42}
-\caption{Turtle flowers.}
-\label{fig42}
-\end{figure}
-```
+Write an appropriately general set of functions that can draw shapes as in Figure 4-3.
 
-### Exercise 3 
+![Turtle pies.](images/fig43.svg)
 
-Write an appropriately general set of functions that can draw shapes as in Figure 4.3.
-
-```@eval
-using ThinkJulia
-fig04_3()
-```
-
-```@raw html
-<figure>
-  <img src="fig43.svg" alt="Turtle pies.">
-  <figcaption>Figure 4.3. Turtle pies.</figcaption>
-</figure>
-```
-
-```@raw latex
-\begin{figure}
-\centering
-\includegraphics{fig43}
-\caption{Turtle pies.}
-\label{fig43}
-\end{figure}
-```
-
-### Exercise 4 
+### Exercise 4-4
 
 The letters of the alphabet can be constructed from a moderate number of basic elements, like vertical and horizontal lines and a few curves. Design an alphabet that can be drawn with a minimal number of basic elements and then write functions that draw the letters.
 
 You should write one function for each letter, with names `draw_a`, `draw_b`, etc., and put your functions in a file named `letters.jl`.
 
-### Exercise 5  
+### Exercise 4-5
 
-Read about spirals at <http://en.wikipedia.org/wiki/Spiral>; then write a program that draws an Archimedian spiral as in Figure 4.4.
+Read about spirals at <http://en.wikipedia.org/wiki/Spiral>; then write a program that draws an Archimedian spiral as in Figure 4-4.
 
-```@eval
-using ThinkJulia
-fig04_4()
-```
-
-```@raw html
-<figure>
-  <img src="fig44.svg" alt="Archimedian spiral.">
-  <figcaption>Figure 4.4. Archimedian spiral.</figcaption>
-</figure>
-```
-
-```@raw latex
-\begin{figure}
-\centering
-\includegraphics{fig44}
-\caption{Archimedian spiral.}
-\label{fig44}
-\end{figure}
-```
+![Archimedian spiral.](images/fig44.svg)

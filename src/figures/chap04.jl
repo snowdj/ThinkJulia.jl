@@ -1,81 +1,59 @@
-using Luxor
-
-function fig04_1()
-  draw_04_1("svg")
-  draw_04_1("pdf")
-end
-
-function draw_04_1(ext)
+function fig04_1(output::Symbol, font::String, scale::Float64)
+  ext = output == :pdf ? "pdf" : "svg"
   Drawing(102, 10, "fig41.$ext")  
   origin()
   background("white")  
-  bob = Turtle()
-  Reposition(bob, -50, 0)
-  Pencolor(bob, "black")
-  Penwidth(bob, 1)
-  Forward(bob, 100)
+  🐢 = Turtle()
+  Reposition(🐢, -50, 0)
+  Pencolor(🐢, "black")
+  Penwidth(🐢, 1)
+  forward(🐢, 100)
   finish() 
-  nothing
 end
 
-function fig04_2()
-  draw_04_2("svg")
-  draw_04_2("pdf")
-end
-
-function draw_04_2(ext)
+function fig04_2(output::Symbol, font::String, scale::Float64)
+  ext = output == :pdf ? "pdf" : "svg"
   Drawing(310, 110, "fig42.$ext")  
   origin()
   background("white")  
-  bob = Turtle()
-  Pencolor(bob, "black")
-  Penwidth(bob, 1)
-  Reposition(bob, -100, 0)
-  flower(bob, 7, 55.0, 60.0)
-  Reposition(bob, 0, 0)
-  flower(bob, 10, 40.0, 80.0)
-  Reposition(bob, 100, 0)
-  flower(bob, 20, 140.0, 20.0)
+  🐢 = Turtle()
+  Pencolor(🐢, "black")
+  Penwidth(🐢, 1)
+  Reposition(🐢, -100, 0)
+  flower(🐢, 7, 55.0, 60.0)
+  Reposition(🐢, 0, 0)
+  flower(🐢, 10, 40.0, 80.0)
+  Reposition(🐢, 100, 0)
+  flower(🐢, 20, 140.0, 20.0)
   finish() 
-  nothing
 end
 
-function fig04_3()
-  draw_04_3("svg")
-  draw_04_3("pdf")
-end
-
-function draw_04_3(ext)
+function fig04_3(output::Symbol, font::String, scale::Float64)
+  ext = output == :pdf ? "pdf" : "svg"
   Drawing(360, 80, "fig43.$ext")  
   origin()
   background("white")  
-  bob = Turtle()
-  Pencolor(bob, "black")
-  Penwidth(bob, 1)
-  Reposition(bob, -140, 0)
+  🐢 = Turtle()
+  Pencolor(🐢, "black")
+  Penwidth(🐢, 1)
+  Reposition(🐢, -140, 0)
   size = 40
-  draw_pie(bob, 5, size)
-  draw_pie(bob, 6, size)
-  draw_pie(bob, 7, size)
-  draw_pie(bob, 8, size)
+  drawpie(🐢, 5, size)
+  drawpie(🐢, 6, size)
+  drawpie(🐢, 7, size)
+  drawpie(🐢, 8, size)
   finish() 
-  nothing
 end
 
-function fig04_4()
-  draw_04_4("svg")
-  draw_04_4("pdf")
-end
-
-function draw_04_4(ext)
+function fig04_4(output::Symbol, font::String, scale::Float64)
+  ext = output == :pdf ? "pdf" : "svg"
   Drawing(110, 110, "fig44.$ext")  
   origin()
   background("white")  
-  bob = Turtle()
-  Pencolor(bob, "black")
-  Penwidth(bob, 1)
-  Reposition(bob, 0, 15)
-  spiral(bob, 230, 3, 0.1, 0.0002)
+  🐢 = Turtle()
+  Pencolor(🐢, "black")
+  Penwidth(🐢, 1)
+  Reposition(🐢, 0, 15)
+  spiral(🐢, 230, 3, 0.1, 0.0002)
   finish() 
-  nothing
 end
