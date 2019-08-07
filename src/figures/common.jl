@@ -1,5 +1,5 @@
 function makefigs(output::Symbol, font::String, scale::Float64)
-  fig00_1(output, font, scale)
+  #fig00_1(output, font, scale)
   fig02_1(output, font, scale)
   fig03_1(output, font, scale)
   fig04_1(output, font, scale)
@@ -23,5 +23,5 @@ function makefigs(output::Symbol, font::String, scale::Float64)
   fig15_2(output, font, scale)
   fig16_1(output, font, scale)
   fig18_1(output, font, scale)
-  #fig19_1(output, font, scale)
+  fig19_1(output, font, scale)
 end

@@ -31,9 +31,9 @@ function expandjuliarepltestblock(root::String, out::IOStream, lines::Vector{Str
   m = findcodeblock(lines, n)
   code = join(lines[n+2:m-1], "\n")
   repl = repltest(code, name, root)
-  println(out, "[source,julia-repl]")
+  println(out, "[source,jlcon]")
   println(out, "----")
-  println(out, replace(repl, "\n\n" => "\n"))
+  println(out, repl)
   println(out, "----")
   m + 1   
 end
@@ -84,9 +84,9 @@ function expandjuliareplblock(root::String, out::IOStream, lines::Vector{String}
   m = findcodeblock(lines, n)
   code = join(lines[n+2:m-1], "\n")
   repl = replrun(code, name, root)
-  println(out, "[source,julia-repl]")
+  println(out, "[source,jlcon]")
   println(out, "----")
-  print(out, replace(repl, "\n\n" => "\n"))
+  print(out, replace(repl, "\n\n"=>"\n"))
   println(out, "----")
   m + 1   
 end

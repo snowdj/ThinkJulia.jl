@@ -20,63 +20,77 @@ const OPENFLAGS = Dict("r"=>0, "w"=>1, "c"=>2, "n"=>3)
 const STOREFLAGS = Dict("r"=>1, "i"=>0)
 
 function gdbm_open(name::String, flag::String="r")
-  handle = ccall((:gdbm_open, "libgdbm"), Ptr{Cvoid}, (Cstring, Int32, Int32, Int32, Ptr{Cvoid}), name, 0, OPENFLAGS[flag], 420, C_NULL)
+  GDBM = Libdl.dlopen_e(libgdbm)
+  gdbm_open = Libdl.dlsym_e(GDBM, :gdbm_open)
+  handle = ccall(gdbm_open, Ptr{Cvoid}, (Cstring, Int32, Int32, Int32, Ptr{Cvoid}), name, 0, OPENFLAGS[flag], 420, C_NULL)
   handle == C_NULL && error("File could not be opened!")
   handle
 end
 
 function gdbm_close(handle::Ptr{Cvoid})
-  ccall((:gdbm_close, "libgdbm"), Cvoid, (Ptr{Cvoid},), handle)
+  GDBM = Libdl.dlopen_e(libgdbm)
+  gdbm_close = Libdl.dlsym_e(GDBM, :gdbm_close)
+  ccall(gdbm_close, Cvoid, (Ptr{Cvoid},), handle)
 end
 
 function gdbm_store(handle::Ptr{Cvoid}, key::Datum, value::Datum, flag::String="r")
-  ret = ccall((:gdbm_store, "libgdbm"), Int32, (Ptr{Cvoid}, Datum, Datum, Int32), handle, key, value, STOREFLAGS[flag])
+  GDBM = Libdl.dlopen_e(libgdbm)
+  gdbm_store = Libdl.dlsym_e(GDBM, :gdbm_store)
+  ret = ccall(gdbm_store, Int32, (Ptr{Cvoid}, Datum, Datum, Int32), handle, key, value, STOREFLAGS[flag])
   ret == -1 && error("Database is not writable or key/value is not a valid string.")
   ret == 1 && error("Key is already in database.")
   nothing
 end
 
 function gdbm_fetch(handle::Ptr{Cvoid}, key::Datum)
-  datum = ccall((:gdbm_fetch, "libgdbm"), Datum, (Ptr{Cvoid}, Datum), handle, key)
+  GDBM = Libdl.dlopen_e(libgdbm)
+  gdbm_fetch = Libdl.dlsym_e(GDBM, :gdbm_fetch)
+  datum = ccall(gdbm_fetch, Datum, (Ptr{Cvoid}, Datum), handle, key)
   datum.dptr == C_NULL && throw(KeyError(key))
   datum
 end
 
 function gdbm_exists(handle::Ptr{Cvoid}, key::Datum)
-  ret = ccall((:gdbm_exists, "libgdbm"), Int32, (Ptr{Cvoid}, Datum), handle, key)
+  GDBM = Libdl.dlopen_e(libgdbm)
+  gdbm_exists = Libdl.dlsym_e(GDBM, :gdbm_exists)
+  ret = ccall(gdbm_exists, Int32, (Ptr{Cvoid}, Datum), handle, key)
   ret == 0 && return false
   true
 end
 
 function gdbm_count(handle::Ptr{Cvoid})
   count = Ref(UInt(0))
-  ret = ccall((:gdbm_count, "libgdbm"), Int32, (Ptr{Cvoid}, Ref{UInt}), handle, count)
+  GDBM = Libdl.dlopen_e(libgdbm)
+  gdbm_count = Libdl.dlsym_e(GDBM, :gdbm_count)
+  ret = ccall(gdbm_count, Int32, (Ptr{Cvoid}, Ref{UInt}), handle, count)
   ret == -1 && error("Error reading database.")
   Int(count[])
 end
 
 function gdbm_delete(handle::Ptr{Cvoid}, key::Datum)
-  ret = ccall((:gdbm_delete, "libgdbm"), Int32, (Ptr{Cvoid}, Datum), handle, key)
+  GDBM = Libdl.dlopen_e(libgdbm)
+  gdbm_delete = Libdl.dlsym_e(GDBM, :gdbm_delete)
+  ret = ccall(gdbm_delete, Int32, (Ptr{Cvoid}, Datum), handle, key)
   ret ≠ 0 && error("Database is not writable or key not found.")
   nothing
 end
 
 function gdbm_firstkey(handle::Ptr{Cvoid})
-  ccall((:gdbm_firstkey, "libgdbm"), Datum, (Ptr{Cvoid}, ), handle)
+  GDBM = Libdl.dlopen_e(libgdbm)
+  gdbm_firstkey = Libdl.dlsym_e(GDBM, :gdbm_firstkey)
+  ccall(gdbm_firstkey, Datum, (Ptr{Cvoid}, ), handle)
 end
 
 function gdbm_nextkey(handle::Ptr{Cvoid}, prev::Datum)
-  ccall((:gdbm_nextkey, "libgdbm"), Datum, (Ptr{Cvoid}, Datum), handle, prev)
-end
-
-function libc_free(ptr::Ptr{UInt8})
-  ccall((:free, "libc"), Cvoid, (Ptr{UInt8}, ), ptr)
+  GDBM = Libdl.dlopen_e(libgdbm)
+  gdbm_nextkey = Libdl.dlsym_e(GDBM, :gdbm_nextkey)
+  ccall(gdbm_nextkey, Datum, (Ptr{Cvoid}, Datum), handle, prev)
 end
 
 function Base.getindex(dbm::DBM, key::Union{String,Array{UInt8,1}})
   datum = gdbm_fetch(dbm.handle, Datum(key))
   value = unsafe_string(datum.dptr, datum.dsize)
-  libc_free(datum.dptr)
+  Libc.free(datum.dptr)
   value
 end
   
@@ -91,18 +105,18 @@ function Base.iterate(dbm::DBM)
   key = unsafe_string(first.dptr, first.dsize)
   datum = gdbm_fetch(dbm.handle, first)
   value = unsafe_string(datum.dptr, datum.dsize)
-  libc_free(datum.dptr)
+  Libc.free(datum.dptr)
   ((key, value), first)
 end
 
 function Base.iterate(dbm::DBM, prev::Datum)
   next = gdbm_nextkey(dbm.handle, prev)
-  libc_free(prev.dptr)
+  Libc.free(prev.dptr)
   next.dptr == C_NULL && return nothing
   key = unsafe_string(next.dptr, next.dsize)
   datum = gdbm_fetch(dbm.handle, next)
   value = unsafe_string(datum.dptr, datum.dsize)
-  libc_free(datum.dptr)
+  Libc.free(datum.dptr)
   ((key, value), next)
 end
 
@@ -126,7 +140,7 @@ function Base.pop!(dbm::DBM, key::Union{String,Array{UInt8,1}}, default = nothin
   if gdbm_exists(dbm.handle, datum)
     vdatum = gdbm_fetch(dbm.handle, datum)
     value = unsafe_string(vdatum.dptr, vdatum.dsize)
-    libc_free(vdatum.dptr)
+    Libc.free(vdatum.dptr)
     gdbm_delete(dbm.handle, datum)
     return value
   end
@@ -145,7 +159,7 @@ function Base.get(dbm::DBM, key::Union{String,Array{UInt8,1}}, default::String)
   if gdbm_exists(dbm.handle, datum)
     datum = gdbm_fetch(dbm.handle, datum)
     value = unsafe_string(datum.dptr, datum.dsize)
-    libc_free(datum.dptr)
+    Libc.free(datum.dptr)
   end
   value
 end
@@ -156,7 +170,7 @@ function Base.get!(dbm::DBM, key::Union{String,Array{UInt8,1}}, default::String)
   if gdbm_exists(dbm.handle, datum)
     vdatum = gdbm_fetch(dbm.handle, datum)
     value = unsafe_string(vdatum.dptr, vdatum.dsize)
-    libc_free(vdatum.dptr)
+    Libc.free(vdatum.dptr)
   else
     gdbm_store(dbm.handle, datum, Datum(default))
   end
@@ -174,7 +188,7 @@ function Base.empty!(dbm::DBM)
     key = unsafe_string(prev.dptr, prev.dsize)
     next = gdbm_nextkey(dbm.handle, prev)
     gdbm_delete(dbm.handle, prev)
-    libc_free(prev.dptr)
+    Libc.free(prev.dptr)
     prev = next
   end
 end
@@ -184,6 +198,6 @@ function Base.in(pair::Union{Pair{String,String},Pair{String,Array{UInt8,1}},Pai
   !gdbm_exists(dbm.handle, datum) && return false
   vdatum = gdbm_fetch(dbm.handle, datum)
   value = unsafe_string(vdatum.dptr, vdatum.dsize)
-  libc_free(vdatum.dptr)
+  Libc.free(vdatum.dptr)
   value == pair.second
 end
